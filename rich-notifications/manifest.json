@@ -1,0 +1,14 @@
+{
+  "name": "Notification API Sample",
+  "description": "Smarter Gmail Notifications",
+  "manifest_version" : 2,
+  "version" : "0.0.1",
+  "permissions" : [
+     "notifications"
+  ],
+  "browser_action": {
+    "default_title" : "Gmail Downloader",
+    "default_icon": "images/icon.png",
+    "default_popup": "window.html"
+  }
+}
