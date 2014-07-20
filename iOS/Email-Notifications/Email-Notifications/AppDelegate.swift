@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Foundation
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -56,8 +57,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         let categories:NSSet = NSSet(objects: firstCategory)
         
-        
-        
         let types:UIUserNotificationType = UIUserNotificationType.Alert | UIUserNotificationType.Badge | UIUserNotificationType.Sound
         
         let mySettings:UIUserNotificationSettings = UIUserNotificationSettings(forTypes: types, categories: categories)
@@ -65,30 +64,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UIApplication.sharedApplication().registerUserNotificationSettings(mySettings)
         UIApplication.sharedApplication().registerForRemoteNotifications()
         
-        application.registerForRemoteNotificationTypes(UIRemoteNotificationType.Badge | UIRemoteNotificationType.Alert | UIRemoteNotificationType.Sound)
-        
         Parse.setApplicationId("nfAn2Baudv76AJ883ctGCZ5QUvUZ5UxIsGXVKeBm", clientKey: "4gjDjW9iaehGqzYOuV1r39escwNBbX0Op7zFZk1H")
         return true
-    }
-    
-    
-    
-    func application(application: UIApplication!,
-        handleActionWithIdentifier identifier:String!,
-        forLocalNotification notification:UILocalNotification!,
-        completionHandler: (() -> Void)!){
-            
-            if (identifier == "FIRST_ACTION"){
-                
-                NSNotificationCenter.defaultCenter().postNotificationName("actionOnePressed", object: nil)
-                
-            }else if (identifier == "SECOND_ACTION"){
-                NSNotificationCenter.defaultCenter().postNotificationName("actionTwoPressed", object: nil)
-                
-            }
-            
-            completionHandler()
-            
     }
     
     func application(application: UIApplication!, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: NSData!) {
@@ -97,8 +74,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         currentInstallation.saveInBackground()
     }
     
-    func application(application: UIApplication!, didReceiveRemoteNotification userInfo: [NSObject : AnyObject]!) {
-        PFPush.handlePush(userInfo)
+    func application(application: UIApplication!, didReceiveRemoteNotification userInfo:NSDictionary) {
+        println(userInfo)
+        PFPush.handlePush({
+            "category":"FIRST_CATEGORY"
+            "alert":"test"
+        })
+        
+        if (userInfo.objectForKey("identifier") as NSString == "FIRST_ACTION"){
+          NSNotificationCenter.defaultCenter().postNotificationName("actionOnePressed", object: nil)
+        } else if (userInfo.objectForKey("identifier") as NSString == "SECOND_ACTION"){
+            NSNotificationCenter.defaultCenter().postNotificationName("actionTwoPressed", object: nil)
+            
+        }
     }
     
     func applicationWillResignActive(application: UIApplication) {

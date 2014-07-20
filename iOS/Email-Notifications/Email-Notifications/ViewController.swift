@@ -16,13 +16,6 @@ class ViewController: UIViewController, UINavigationControllerDelegate {
         NSNotificationCenter.defaultCenter().addObserver(self, selector:"drawAShape:", name: "actionOnePressed", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector:"showAMessage:", name: "actionTwoPressed", object: nil)
         
-        
-        var notification:UILocalNotification = UILocalNotification()
-        notification.category = "FIRST_CATEGORY"
-        notification.alertBody = "Hi, I am a notification"
-        notification.fireDate = date
-        
-        UIApplication.sharedApplication().scheduleLocalNotification(notification)
     }
     
     
