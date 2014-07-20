@@ -13,18 +13,20 @@ class ViewController: UIViewController, UINavigationControllerDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector:"drawAShape:", name: "actionOnePressed", object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector:"showAMessage:", name: "actionTwoPressed", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector:"showWebView:", name: "showWebView", object: nil)
         
     }
     
-    
-    func drawAShape(notification:NSNotification){
-        var view:UIView = UIView(frame:CGRectMake(10, 10, 100, 100))
-        view.backgroundColor = UIColor.redColor()
-        
-        self.view.addSubview(view)
-        
+    func showWebView(notification:NSNotification){
+        //Create a URL object.
+        let url = NSURL.URLWithString(notification.object.objectForKey("link") as NSString)
+//        UIApplication.sharedApplication().openURL(url)
+//        let controller = UIWebViewController.
+        let view:UIWebView = UIWebView()
+        view.loadRequest(NSURLRequest(URL: url));
+        let ctl = UIViewController()
+        ctl.view = view
+    self.navigationController.pushViewController(ctl, animated: true)
     }
     
     func showAMessage(notification:NSNotification){
@@ -45,7 +47,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate {
     
     @IBAction func authorizeWithGoogle(sender: AnyObject) {
         let backButton: UIBarButtonItem = UIBarButtonItem(
-            title:"back",
+            title:"Back",
             style:UIBarButtonItemStyle.Bordered,
             target:self,
             action:Selector("handleBack:"))

@@ -36,11 +36,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let buttons: NSArray = userInfo.objectForKey("buttons") as NSArray
         let actions: NSMutableArray = NSMutableArray()
         let minimalActions: NSMutableArray = NSMutableArray()
+        let userInfo: NSMutableDictionary = NSMutableDictionary()
         for b in buttons {
             var action = self.createAction(b as NSDictionary)
             actions.addObject(action)
             if (minimalActions.count < 2) {
                 minimalActions.addObject(action)
+                
+                userInfo.setObject(b, forKey:action.identifier)
             }
         }
         
@@ -57,13 +60,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let notification: UILocalNotification = UILocalNotification()
         notification.alertBody = "This is an alert" // userInfo.objectForKey("title") as NSString
         notification.category = "FIRST_CATEGORY"
+        notification.userInfo = userInfo
         UIApplication.sharedApplication().presentLocalNotificationNow(notification)
+        
+        completionHandler(UIBackgroundFetchResult.NewData)
     }
     
     func createAction(button: NSDictionary) -> UIMutableUserNotificationAction {
         var action:UIMutableUserNotificationAction = UIMutableUserNotificationAction()
         
-        action.destructive = true
+        action.destructive = false
         switch button.objectForKey("buttonText") as NSString {
             case "Star":
                 action.identifier = "star"
@@ -84,15 +90,36 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             
             default:
                 action.identifier = "link"
-                action.activationMode = UIUserNotificationActivationMode.Background
+                action.activationMode = UIUserNotificationActivationMode.Foreground
         }
-        
+        action.identifier = action.identifier + "." + String(arc4random_uniform(100000))
         action.title = button.objectForKey("buttonText") as NSString
         action.authenticationRequired = false
         
         return action
     }
     
+    func application(application: UIApplication!,
+        handleActionWithIdentifier identifier:String!,
+        forLocalNotification notification:UILocalNotification!,
+        completionHandler: (() -> Void)!) {
+        let link:NSString = (notification.userInfo as NSDictionary).objectForKey(identifier).objectForKey("link") as NSString
+        switch (identifier as NSString).substringToIndex((identifier as NSString).rangeOfString(".").location) as NSString {
+            case "star":
+                println("star")
+            case "picture":
+                println("picture")
+            case "goto":
+                println("goto")
+            case "link":
+                println("link")
+                println(link)
+                NSNotificationCenter.defaultCenter().postNotificationName("showWebView", object:["link":link])
+            default:
+                assert(false, "not implemented")
+        }
+        completionHandler()
+    }
     func application(application: UIApplication!, didReceiveRemoteNotification userInfo:NSDictionary) {
         println(userInfo)
         PFPush.handlePush(userInfo)
