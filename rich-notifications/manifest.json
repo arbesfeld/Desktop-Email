@@ -4,7 +4,8 @@
   "manifest_version" : 2,
   "version" : "0.0.1",
   "permissions" : [
-     "notifications"
+     "notifications",
+     "<all_urls>"
   ],
   "browser_action": {
     "default_title" : "Gmail Downloader",

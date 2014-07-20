@@ -31,25 +31,31 @@ function doNotify(evt) {
 	};
 
 	options.type = "basic";
-	options.title = evt.title;
-	options.message = evt.message;
+	options.title = evt.from;
+	options.message = evt.title;
 
-	if (evt.imageURL) {
+  if (evt.imageUrl) {
+    options.iconUrl = evt.imageUrl;
+  }
+
+	if (evt.prettyImage) {
 			options.type = "image";
-			options.imageUrl = chrome.runtime.getURL(evt.imageURL);
+      options.imageUrl = evt.prettyImage;
+			// options.imageUrl = chrome.runtime.getURL("/images/oceania-400x400.png");
 	}
 	window.buttonLinkMap = {};
-	options.buttons.push(createButton(notID, evt.buttonText, evt.link));
+	options.buttons.push(createButton(notID.toString() + 0, evt.buttonText, evt.link));
 	if (evt.buttontext2){
-		options.buttons.push(createButton(notID, evt.buttontext2, evt.buttonlink2));
+		options.buttons.push(createButton(notID + 1, evt.buttontext2, evt.buttonlink2));
 	}
 
 	options.priority = 2;
 
 	chrome.notifications.create("id"+notID++, options, creationCallback);
+  notID++;
 }
 
-function createButton(notID, text, link){
+function createButton(buttonID, text, link){
 	var button = {
 		title: text
 	};
@@ -57,7 +63,7 @@ function createButton(notID, text, link){
 		console.log("HERO")
 		button["iconUrl"] = "/images/star-01.png";
 	}
-	window.buttonLinkMap["id" + notID + text] = link;
+	window.buttonLinkMap["id" + buttonID] = link;
 	return button;
 }
 
@@ -67,7 +73,7 @@ function creationCallback(notID) {
 		chrome.notifications.clear(notID, function(wasCleared) {
 			console.log("Notification " + notID + " cleared: " + wasCleared);
 		});
-	}, 4000);
+	}, 20000);
 }
 
 // Event handlers for the various notification events
@@ -80,7 +86,7 @@ function notificationClicked(notID) {
 }
 
 function notificationBtnClick(notID, iBtn) {
-	console.log(buttonLinkMap[notID+iBtn.title])
+  chrome.tabs.create({url: buttonLinkMap[notID+iBtn]});
 	console.log("The notification '" + notID + "' had button " + iBtn + " clicked");
 }
 
@@ -88,7 +94,7 @@ window.onmessage=function(e){
   if (e.data) {
     console.log('I got data in my chrome extenssion', e.data);
     var data = JSON.parse(e.data);
-    if (Date.now() - data.timeStamp < 100000){
+    if (Date.now() - data.timeStamp < 1000000){
       doNotify(data);
     }
   }
