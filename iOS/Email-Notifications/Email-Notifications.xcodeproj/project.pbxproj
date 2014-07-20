@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		409B1E30197C0226002B6E65 /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 409B1E2F197C0226002B6E65 /* MessageUI.framework */; };
 		40A85C76197BA43500061944 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40A85C75197BA43500061944 /* AppDelegate.swift */; };
 		40A85C78197BA43500061944 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40A85C77197BA43500061944 /* ViewController.swift */; };
 		40A85C7B197BA43500061944 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 40A85C79197BA43500061944 /* Main.storyboard */; };
@@ -41,6 +42,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		409B1E2F197C0226002B6E65 /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
 		40A85C70197BA43500061944 /* Email-Notifications.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Email-Notifications.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		40A85C74197BA43500061944 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		40A85C75197BA43500061944 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -78,6 +80,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				409B1E30197C0226002B6E65 /* MessageUI.framework in Frameworks */,
 				40A85CB7197BAC3000061944 /* StoreKit.framework in Frameworks */,
 				40A85CB5197BAC2C00061944 /* QuartzCore.framework in Frameworks */,
 				40A85CB3197BAC2700061944 /* MobileCoreServices.framework in Frameworks */,
@@ -105,6 +108,7 @@
 		40A85C67197BA43500061944 = {
 			isa = PBXGroup;
 			children = (
+				409B1E2F197C0226002B6E65 /* MessageUI.framework */,
 				40A85CB6197BAC3000061944 /* StoreKit.framework */,
 				40A85CB4197BAC2C00061944 /* QuartzCore.framework */,
 				40A85CB2197BAC2700061944 /* MobileCoreServices.framework */,

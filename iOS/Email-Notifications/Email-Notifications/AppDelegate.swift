@@ -36,16 +36,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let buttons: NSArray = userInfo.objectForKey("buttons") as NSArray
         let actions: NSMutableArray = NSMutableArray()
         let minimalActions: NSMutableArray = NSMutableArray()
-        let userInfo: NSMutableDictionary = NSMutableDictionary()
+        let newInfo: NSMutableDictionary = NSMutableDictionary()
         for b in buttons {
             var action = self.createAction(b as NSDictionary)
             actions.addObject(action)
             if (minimalActions.count < 2) {
                 minimalActions.addObject(action)
                 
-                userInfo.setObject(b, forKey:action.identifier)
+                newInfo.setObject(b, forKey:action.identifier)
             }
         }
+        newInfo.setObject(userInfo.objectForKey("from"), forKey:"from")
         
         let firstCategory:UIMutableUserNotificationCategory = UIMutableUserNotificationCategory()
         firstCategory.identifier = "FIRST_CATEGORY"
@@ -60,7 +61,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let notification: UILocalNotification = UILocalNotification()
         notification.alertBody = "This is an alert" // userInfo.objectForKey("title") as NSString
         notification.category = "FIRST_CATEGORY"
-        notification.userInfo = userInfo
+        notification.userInfo = newInfo
         UIApplication.sharedApplication().presentLocalNotificationNow(notification)
         
         completionHandler(UIBackgroundFetchResult.NewData)
@@ -120,16 +121,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         completionHandler()
     }
-    func application(application: UIApplication!, didReceiveRemoteNotification userInfo:NSDictionary) {
-        println(userInfo)
-        PFPush.handlePush(userInfo)
+    
+    func application(application: UIApplication!, didReceiveLocalNotification notification: UILocalNotification!) {
         
-//        if (userInfo.objectForKey("identifier") as NSString == "FIRST_ACTION"){
-//          NSNotificationCenter.defaultCenter().postNotificationName("actionOnePressed", object: userInfo)
-//        } else if (userInfo.objectForKey("identifier") as NSString == "SECOND_ACTION"){
-//            NSNotificationCenter.defaultCenter().postNotificationName("actionTwoPressed", object: nil)
-//            
-//        }
+        NSNotificationCenter.defaultCenter().postNotificationName("sendMail", object:["from":[(notification.userInfo as NSDictionary).objectForKey("from")]])
     }
     
     func applicationWillResignActive(application: UIApplication) {
