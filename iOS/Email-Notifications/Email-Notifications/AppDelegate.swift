@@ -58,13 +58,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         
         
-        let types:UIUserNotificationType = UIUserNotificationType.Alert | UIUserNotificationType.Badge
+        let types:UIUserNotificationType = UIUserNotificationType.Alert | UIUserNotificationType.Badge | UIUserNotificationType.Sound
         
         let mySettings:UIUserNotificationSettings = UIUserNotificationSettings(forTypes: types, categories: categories)
         
         UIApplication.sharedApplication().registerUserNotificationSettings(mySettings)
+        UIApplication.sharedApplication().registerForRemoteNotifications()
         
+        application.registerForRemoteNotificationTypes(UIRemoteNotificationType.Badge | UIRemoteNotificationType.Alert | UIRemoteNotificationType.Sound)
         
+        Parse.setApplicationId("nfAn2Baudv76AJ883ctGCZ5QUvUZ5UxIsGXVKeBm", clientKey: "4gjDjW9iaehGqzYOuV1r39escwNBbX0Op7zFZk1H")
         return true
     }
     
@@ -86,6 +89,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             
             completionHandler()
             
+    }
+    
+    func application(application: UIApplication!, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: NSData!) {
+        let currentInstallation: PFInstallation = PFInstallation.currentInstallation()
+        currentInstallation.setDeviceTokenFromData(deviceToken)
+        currentInstallation.saveInBackground()
+    }
+    
+    func application(application: UIApplication!, didReceiveRemoteNotification userInfo: [NSObject : AnyObject]!) {
+        PFPush.handlePush(userInfo)
     }
     
     func applicationWillResignActive(application: UIApplication) {

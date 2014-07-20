@@ -16,17 +16,6 @@ class ViewController: UIViewController, UINavigationControllerDelegate {
         NSNotificationCenter.defaultCenter().addObserver(self, selector:"drawAShape:", name: "actionOnePressed", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector:"showAMessage:", name: "actionTwoPressed", object: nil)
         
-        var dateComp:NSDateComponents = NSDateComponents()
-        dateComp.year = 2014;
-        dateComp.month = 06;
-        dateComp.day = 09;
-        dateComp.hour = 15;
-        dateComp.minute = 26;
-        dateComp.timeZone = NSTimeZone.systemTimeZone()
-        
-        var calender:NSCalendar = NSCalendar(calendarIdentifier: NSGregorianCalendar)
-        var date:NSDate = calender.dateFromComponents(dateComp)
-        
         
         var notification:UILocalNotification = UILocalNotification()
         notification.category = "FIRST_CATEGORY"
