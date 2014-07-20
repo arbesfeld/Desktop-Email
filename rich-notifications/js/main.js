@@ -39,7 +39,7 @@ function doNotify(evt) {
 			options.imageUrl = chrome.runtime.getURL(evt.imageURL);
 	}
 	window.buttonLinkMap = {};
-	options.buttons.push(createButton(notID, evt.buttontext1, evt.buttonlink1));
+	options.buttons.push(createButton(notID, evt.buttonText, evt.link));
 	if (evt.buttontext2){
 		options.buttons.push(createButton(notID, evt.buttontext2, evt.buttonlink2));
 	}
@@ -65,10 +65,9 @@ function creationCallback(notID) {
 	console.log("Succesfully created ");
 	setTimeout(function() {
 		chrome.notifications.clear(notID, function(wasCleared) {
-			console.log("haouaoeu");
 			console.log("Notification " + notID + " cleared: " + wasCleared);
 		});
-	}, 3000);
+	}, 4000);
 }
 
 // Event handlers for the various notification events
@@ -83,4 +82,14 @@ function notificationClicked(notID) {
 function notificationBtnClick(notID, iBtn) {
 	console.log(buttonLinkMap[notID+iBtn.title])
 	console.log("The notification '" + notID + "' had button " + iBtn + " clicked");
+}
+
+window.onmessage=function(e){
+  if (e.data) {
+    console.log('I got data in my chrome extenssion', e.data);
+    var data = JSON.parse(e.data);
+    if (Date.now() - data.timeStamp < 10000){
+      doNotify(data);
+    }
+  }
 }
