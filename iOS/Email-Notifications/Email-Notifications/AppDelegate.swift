@@ -13,77 +13,96 @@ import Foundation
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var window: UIWindow?
-    
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: NSDictionary?) -> Bool {
-        
-        // Actions
-        var firstAction:UIMutableUserNotificationAction = UIMutableUserNotificationAction()
-        firstAction.identifier = "FIRST_ACTION"
-        firstAction.title = "First Action"
-        
-        firstAction.activationMode = UIUserNotificationActivationMode.Background
-        firstAction.destructive = true
-        firstAction.authenticationRequired = false
-        
-        var secondAction:UIMutableUserNotificationAction = UIMutableUserNotificationAction()
-        secondAction.identifier = "SECOND_ACTION"
-        secondAction.title = "Second Action"
-        
-        secondAction.activationMode = UIUserNotificationActivationMode.Foreground
-        secondAction.destructive = false
-        secondAction.authenticationRequired = false
-        
-        var thirdAction:UIMutableUserNotificationAction = UIMutableUserNotificationAction()
-        thirdAction.identifier = "THIRD_ACTION"
-        thirdAction.title = "Third Action"
-        
-        thirdAction.activationMode = UIUserNotificationActivationMode.Background
-        thirdAction.destructive = false
-        thirdAction.authenticationRequired = false
-        
-        
-        // category
-        
-        var firstCategory:UIMutableUserNotificationCategory = UIMutableUserNotificationCategory()
-        firstCategory.identifier = "FIRST_CATEGORY"
-        
-        let defaultActions:NSArray = [firstAction, secondAction, thirdAction]
-        let minimalActions:NSArray = [firstAction, secondAction]
-        
-        firstCategory.setActions(defaultActions, forContext: UIUserNotificationActionContext.Default)
-        firstCategory.setActions(minimalActions, forContext: UIUserNotificationActionContext.Minimal)
-        
-        // NSSet of all our categories
-        
-        let categories:NSSet = NSSet(objects: firstCategory)
-        
-        let types:UIUserNotificationType = UIUserNotificationType.Alert | UIUserNotificationType.Badge | UIUserNotificationType.Sound
-        
-        let mySettings:UIUserNotificationSettings = UIUserNotificationSettings(forTypes: types, categories: categories)
-        
-        UIApplication.sharedApplication().registerUserNotificationSettings(mySettings)
         UIApplication.sharedApplication().registerForRemoteNotifications()
         
         Parse.setApplicationId("nfAn2Baudv76AJ883ctGCZ5QUvUZ5UxIsGXVKeBm", clientKey: "4gjDjW9iaehGqzYOuV1r39escwNBbX0Op7zFZk1H")
         return true
     }
     
-    func application(application: UIApplication!, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: NSData!) {
-        let currentInstallation: PFInstallation = PFInstallation.currentInstallation()
-        currentInstallation.setDeviceTokenFromData(deviceToken)
-        currentInstallation.saveInBackground()
+    func createAuthController() -> GTMOAuth2ViewControllerTouch {
+        return GTMOAuth2ViewControllerTouch(scope: "https://mail.google.com/, https://www.googleapis.com/auth/gmail.readonly",
+            clientID: "282638394231.apps.googleusercontent.com",
+            clientSecret: "Wl6jNzcegs_Pvfy21xoGR-mE",
+            keychainItemName: "com.arbesfeld.Email-Notifications-oauth",
+            delegate: self,
+            finishedSelector: Selector("viewController:finishedWithAuth:error:"))
+        
+    }
+    
+    func application(application: UIApplication!, didReceiveRemoteNotification userInfo:NSDictionary, fetchCompletionHandler completionHandler: ((UIBackgroundFetchResult) -> Void)!) {
+        println(userInfo)
+        
+        let buttons: NSArray = userInfo.objectForKey("buttons") as NSArray
+        let actions: NSMutableArray = NSMutableArray()
+        let minimalActions: NSMutableArray = NSMutableArray()
+        for b in buttons {
+            var action = self.createAction(b as NSDictionary)
+            actions.addObject(action)
+            if (minimalActions.count < 2) {
+                minimalActions.addObject(action)
+            }
+        }
+        
+        let firstCategory:UIMutableUserNotificationCategory = UIMutableUserNotificationCategory()
+        firstCategory.identifier = "FIRST_CATEGORY"
+        firstCategory.setActions(actions, forContext: UIUserNotificationActionContext.Default)
+        firstCategory.setActions(minimalActions, forContext: UIUserNotificationActionContext.Minimal)
+        
+        let categories:NSSet = NSSet(objects: firstCategory)
+        let types:UIUserNotificationType = UIUserNotificationType.Alert | UIUserNotificationType.Badge
+        let mySettings:UIUserNotificationSettings = UIUserNotificationSettings(forTypes: types, categories: categories)
+        UIApplication.sharedApplication().registerUserNotificationSettings(mySettings)
+        
+        let notification: UILocalNotification = UILocalNotification()
+        notification.alertBody = "This is an alert" // userInfo.objectForKey("title") as NSString
+        notification.category = "FIRST_CATEGORY"
+        UIApplication.sharedApplication().presentLocalNotificationNow(notification)
+    }
+    
+    func createAction(button: NSDictionary) -> UIMutableUserNotificationAction {
+        var action:UIMutableUserNotificationAction = UIMutableUserNotificationAction()
+        
+        action.destructive = true
+        switch button.objectForKey("buttonText") as NSString {
+            case "Star":
+                action.identifier = "star"
+                action.activationMode = UIUserNotificationActivationMode.Background
+    
+            case "Picture":
+                action.identifier = "picture"
+                action.activationMode = UIUserNotificationActivationMode.Foreground
+            
+            case "View":
+                action.identifier = "goto"
+                action.activationMode = UIUserNotificationActivationMode.Foreground
+            
+            case "Spam":
+                action.identifier = "link"
+                action.activationMode = UIUserNotificationActivationMode.Background
+                action.destructive = true
+            
+            default:
+                action.identifier = "link"
+                action.activationMode = UIUserNotificationActivationMode.Background
+        }
+        
+        action.title = button.objectForKey("buttonText") as NSString
+        action.authenticationRequired = false
+        
+        return action
     }
     
     func application(application: UIApplication!, didReceiveRemoteNotification userInfo:NSDictionary) {
         println(userInfo)
         PFPush.handlePush(userInfo)
         
-        if (userInfo.objectForKey("identifier") as NSString == "FIRST_ACTION"){
-          NSNotificationCenter.defaultCenter().postNotificationName("actionOnePressed", object: userInfo)
-        } else if (userInfo.objectForKey("identifier") as NSString == "SECOND_ACTION"){
-            NSNotificationCenter.defaultCenter().postNotificationName("actionTwoPressed", object: nil)
-            
-        }
+//        if (userInfo.objectForKey("identifier") as NSString == "FIRST_ACTION"){
+//          NSNotificationCenter.defaultCenter().postNotificationName("actionOnePressed", object: userInfo)
+//        } else if (userInfo.objectForKey("identifier") as NSString == "SECOND_ACTION"){
+//            NSNotificationCenter.defaultCenter().postNotificationName("actionTwoPressed", object: nil)
+//            
+//        }
     }
     
     func applicationWillResignActive(application: UIApplication) {
