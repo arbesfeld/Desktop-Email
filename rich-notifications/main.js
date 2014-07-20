@@ -1,3 +1,48 @@
+$(document).ready(function(){
+		$('#menu-pages').sortable();
+});
+
+$(function  () {
+  $("ol.example").sortable()
+})
+
+var adjustment
+
+$("ol.simple_with_animation").sortable({
+  group: 'simple_with_animation',
+  pullPlaceholder: false,
+  // animation on drop
+  onDrop: function  (item, targetContainer, _super) {
+    var clonedItem = $('<li/>').css({height: 0})
+    item.before(clonedItem)
+    clonedItem.animate({'height': item.height()})
+
+    item.animate(clonedItem.position(), function  () {
+      clonedItem.detach()
+      _super(item)
+    })
+  },
+
+  // set item relative to cursor position
+  onDragStart: function ($item, container, _super) {
+    var offset = $item.offset(),
+    pointer = container.rootGroup.pointer
+
+    adjustment = {
+      left: pointer.left - offset.left,
+      top: pointer.top - offset.top
+    }
+
+    _super($item, container)
+  },
+  onDrag: function ($item, position) {
+    $item.css({
+      left: position.left - adjustment.left,
+      top: position.top - adjustment.top
+    })
+  }
+})
+
 // Declare a variable to generate unique notification IDs
 var notID = 0;
 
@@ -15,7 +60,7 @@ var asURLs = [
 	"/images/south-america-400x400.png"
 ];
 
-// List of sample notifications. These are further customized 
+// List of sample notifications. These are further customized
 // in the code according the UI settings.
 var notOptions = [
 	{
@@ -34,9 +79,9 @@ var notOptions = [
 		title: "List Notification",
 		message: "List of items in a message",
 		items: [
-			{ title: "Item1", message: "This is item 1"},
-			{ title: "Item2", message: "This is item 2"},
-			{ title: "Item3", message: "This is item 3"},
+			{ title: "Item1", message: "This is a long message."},
+			{ title: "Item2", message: "This is another message"},
+			{ title: "Item3", message: "This is testing wooohooo this is fun, does it look good?"},
 			{ title: "Item4", message: "This is item 4"},
 			{ title: "Item5", message: "This is item 5"},
 			{ title: "Item6", message: "This is item 6"},
@@ -48,15 +93,15 @@ var notOptions = [
 		message: "Short message plus an image",
 		progress: 60
 	}
-	
+
 ];
 
 // Window initialization code. Set up the various event handlers
 window.addEventListener("load", function() {
-	document.getElementById("basic").addEventListener("click", doNotify);
-	document.getElementById("image").addEventListener("click", doNotify);
-	document.getElementById("list").addEventListener("click", doNotify);
-	document.getElementById("progress").addEventListener("click", doNotify);
+	//document.getElementById("basic").addEventListener("click", doNotify);
+	//document.getElementById("image").addEventListener("click", doNotify);
+	//document.getElementById("list").addEventListener("click", doNotify);
+	//document.getElementById("progress").addEventListener("click", doNotify);
 
 	// set up the event listeners
 	chrome.notifications.onClosed.addListener(notificationClosed);
@@ -70,6 +115,7 @@ function doNotify(evt) {
 	var options = null;
 	var sBtn1 = document.getElementById("btn1").value;
 	var sBtn2 = document.getElementById("btn2").value;
+
 	// Create the right notification for the selected type
 	if (evt.srcElement.id == "basic") {
 		options = notOptions[0];
@@ -87,16 +133,15 @@ function doNotify(evt) {
 
 	options.iconUrl = path;
 	// priority is from -2 to 2. The API makes no guarantee about how notifications are
-	// visually handled by the OS - they simply represent hints that the OS can use to 
+	// visually handled by the OS - they simply represent hints that the OS can use to
 	// order or display them however it wishes.
 	options.priority = document.getElementById("pri").options.selectedIndex - 2;
 
 	options.buttons = [];
-	if (sBtn1.length)
-		options.buttons.push({ title: sBtn1 });
+	options.buttons.push({ title: "Star", iconUrl: "/images/star-01.png" });
 	if (sBtn2.length)
 		options.buttons.push({ title: sBtn2 });
-		
+
 	chrome.notifications.create("id"+notID++, options, creationCallback);
 }
 
