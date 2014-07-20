@@ -1,159 +1,74 @@
-$(document).ready(function(){
-		$('#menu-pages').sortable();
-});
-
-$(function  () {
-  $("ol.example").sortable()
-})
-
-var adjustment
-
-$("ol.simple_with_animation").sortable({
-  group: 'simple_with_animation',
-  pullPlaceholder: false,
-  // animation on drop
-  onDrop: function  (item, targetContainer, _super) {
-    var clonedItem = $('<li/>').css({height: 0})
-    item.before(clonedItem)
-    clonedItem.animate({'height': item.height()})
-
-    item.animate(clonedItem.position(), function  () {
-      clonedItem.detach()
-      _super(item)
-    })
-  },
-
-  // set item relative to cursor position
-  onDragStart: function ($item, container, _super) {
-    var offset = $item.offset(),
-    pointer = container.rootGroup.pointer
-
-    adjustment = {
-      left: pointer.left - offset.left,
-      top: pointer.top - offset.top
-    }
-
-    _super($item, container)
-  },
-  onDrag: function ($item, position) {
-    $item.css({
-      left: position.left - adjustment.left,
-      top: position.top - adjustment.top
-    })
-  }
-})
-
-// Declare a variable to generate unique notification IDs
-var notID = 0;
-
-// partial URLs to the images used in the example
-var asURLs = [
-	"/images/inbox-64x64.png",
-	"/images/inbox-08-64x64.png",
-	"/images/white-64x64.png",
-	"/images/africa-400x400.png",
-	"/images/antartica-400x400.png",
-	"/images/asia-400x400.png",
-	"/images/europe-400x400.png",
-	"/images/north-america-400x400.png",
-	"/images/oceania-400x400.png",
-	"/images/south-america-400x400.png"
-];
-
-// List of sample notifications. These are further customized
-// in the code according the UI settings.
-var notOptions = [
-	{
-		type : "basic",
-		title: "Basic Notification",
-		message: "Short message part",
-		expandedMessage: "Longer part of the message",
-	},
-	{
-		type : "image",
-		title: "Image Notification",
-		message: "Short message plus an image",
-	},
-	{
-		type : "list",
-		title: "List Notification",
-		message: "List of items in a message",
-		items: [
-			{ title: "Item1", message: "This is a long message."},
-			{ title: "Item2", message: "This is another message"},
-			{ title: "Item3", message: "This is testing wooohooo this is fun, does it look good?"},
-			{ title: "Item4", message: "This is item 4"},
-			{ title: "Item5", message: "This is item 5"},
-			{ title: "Item6", message: "This is item 6"},
-		]
-	},
-	{
-		type : "progress",
-		title: "Progress Notification",
-		message: "Short message plus an image",
-		progress: 60
-	}
-
-];
+// For testing
+// var evt = {
+// 	title: "hello",
+// 	message: "world",
+// 	buttontext1: "star",
+// 	buttonlink1: "about.com"
+// };
+//
+// console.log("hello");
+// doNotify(evt);
 
 // Window initialization code. Set up the various event handlers
 window.addEventListener("load", function() {
-	//document.getElementById("basic").addEventListener("click", doNotify);
-	//document.getElementById("image").addEventListener("click", doNotify);
-	//document.getElementById("list").addEventListener("click", doNotify);
-	//document.getElementById("progress").addEventListener("click", doNotify);
-
 	// set up the event listeners
 	chrome.notifications.onClosed.addListener(notificationClosed);
 	chrome.notifications.onClicked.addListener(notificationClicked);
 	chrome.notifications.onButtonClicked.addListener(notificationBtnClick);
 });
 
+var buttonLinkMap = {}
 // Create the notification with the given parameters as they are set in the UI
 function doNotify(evt) {
-	var path = chrome.runtime.getURL(asURLs[document.getElementById("img").options.selectedIndex]);
-	var options = null;
-	var sBtn1 = document.getElementById("btn1").value;
-	var sBtn2 = document.getElementById("btn2").value;
+	var notID = 0;
+	var options = {
+		type: "basic",
+		title: "null1",
+		message: "null2",
+		imageUrl: null,
+		iconUrl: "images/inbox-64x64.png",
+		buttons: []
+	};
 
-	// Create the right notification for the selected type
-	if (evt.srcElement.id == "basic") {
-		options = notOptions[0];
+	options.type = "basic";
+	options.title = evt.title;
+	options.message = evt.message;
+
+	if (evt.imageURL) {
+			options.type = "image";
+			options.imageUrl = chrome.runtime.getURL(evt.imageURL);
 	}
-	else if (evt.srcElement.id == "image") {
-		options = notOptions[1];
-		options.imageUrl = chrome.runtime.getURL("/images/tahoe-320x215.png");
-	}
-	else if (evt.srcElement.id == "list") {
-		options = notOptions[2];
-	}
-	else if (evt.srcElement.id == "progress") {
-		options = notOptions[3];
+	window.buttonLinkMap = {};
+	options.buttons.push(createButton(notID, evt.buttontext1, evt.buttonlink1));
+	if (evt.buttontext2){
+		options.buttons.push(createButton(notID, evt.buttontext2, evt.buttonlink2));
 	}
 
-	options.iconUrl = path;
-	// priority is from -2 to 2. The API makes no guarantee about how notifications are
-	// visually handled by the OS - they simply represent hints that the OS can use to
-	// order or display them however it wishes.
-	options.priority = document.getElementById("pri").options.selectedIndex - 2;
-
-	options.buttons = [];
-	options.buttons.push({ title: "Star", iconUrl: "/images/star-01.png" });
-	if (sBtn2.length)
-		options.buttons.push({ title: sBtn2 });
+	options.priority = 2;
 
 	chrome.notifications.create("id"+notID++, options, creationCallback);
 }
 
-function creationCallback(notID) {
-	console.log("Succesfully created " + notID + " notification");
-	if (document.getElementById("clear").checked) {
-		setTimeout(function() {
-			chrome.notifications.clear(notID, function(wasCleared) {
-				console.log("Notification " + notID + " cleared: " + wasCleared);
-			});
-		}, 3000);
+function createButton(notID, text, link){
+	var button = {
+		title: text
+	};
+	if (text == "star") {
+		console.log("HERO")
+		button["iconUrl"] = "/images/star-01.png";
 	}
+	window.buttonLinkMap["id" + notID + text] = link;
+	return button;
+}
+
+function creationCallback(notID) {
+	console.log("Succesfully created ");
+	setTimeout(function() {
+		chrome.notifications.clear(notID, function(wasCleared) {
+			console.log("haouaoeu");
+			console.log("Notification " + notID + " cleared: " + wasCleared);
+		});
+	}, 3000);
 }
 
 // Event handlers for the various notification events
@@ -166,5 +81,6 @@ function notificationClicked(notID) {
 }
 
 function notificationBtnClick(notID, iBtn) {
+	console.log(buttonLinkMap[notID+iBtn.title])
 	console.log("The notification '" + notID + "' had button " + iBtn + " clicked");
 }
