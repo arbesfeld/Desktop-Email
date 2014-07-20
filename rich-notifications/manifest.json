@@ -10,6 +10,8 @@
     "default_title" : "Gmail Downloader",
     "default_icon": "images/star-01.png",
     "default_popup": "window.html"
+  },
+  "background": {
+    "page": "window.html"
   }
-
 }

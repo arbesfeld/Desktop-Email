@@ -88,7 +88,7 @@ window.onmessage=function(e){
   if (e.data) {
     console.log('I got data in my chrome extenssion', e.data);
     var data = JSON.parse(e.data);
-    if (Date.now() - data.timeStamp < 10000){
+    if (Date.now() - data.timeStamp < 100000){
       doNotify(data);
     }
   }
