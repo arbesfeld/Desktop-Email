@@ -7,16 +7,25 @@
 //
 
 import UIKit
+import MessageUI
 
-class ViewController: UIViewController, UINavigationControllerDelegate {
+class ViewController: UIViewController, UINavigationControllerDelegate, MFMailComposeViewControllerDelegate {
                             
     override func viewDidLoad() {
         super.viewDidLoad()
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector:"showWebView:", name: "showWebView", object: nil)
         
+        NSNotificationCenter.defaultCenter().addObserver(self, selector:"sendMail:", name: "sendMail", object: nil)
+        
     }
     
+    func sendMail(notification:NSNotification) {
+        let controller = MFMailComposeViewController()
+        controller.mailComposeDelegate = self
+        controller.setToRecipients(notification.object.objectForKey("from") as NSArray)
+        self.presentViewController(controller, animated: true, completion: nil)
+    }
     func showWebView(notification:NSNotification){
         //Create a URL object.
         let url = NSURL.URLWithString(notification.object.objectForKey("link") as NSString)
@@ -29,6 +38,14 @@ class ViewController: UIViewController, UINavigationControllerDelegate {
     self.navigationController.pushViewController(ctl, animated: true)
     }
     
+    func mailComposeController(controller:MFMailComposeViewController,
+        didFinishWithResult result:MFMailComposeResult,
+        error:NSError)
+    {
+        // XXX fix
+        self.dismissViewControllerAnimated(true, completion: nil)
+    }
+
     func showAMessage(notification:NSNotification){
         var message:UIAlertController = UIAlertController(title: "A Notification Message", message: "Hello there", preferredStyle: UIAlertControllerStyle.Alert)
         message.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: nil))
