@@ -44,9 +44,9 @@ function doNotify(evt) {
 			// options.imageUrl = chrome.runtime.getURL("/images/oceania-400x400.png");
 	}
 	window.buttonLinkMap = {};
-	options.buttons.push(createButton(notID.toString() + 0, evt.buttonText, evt.link));
-	if (evt.buttontext2){
-		options.buttons.push(createButton(notID + 1, evt.buttontext2, evt.buttonlink2));
+	options.buttons.push(createButton(notID.toString() + 0, evt.buttons[0].buttonText, evt.buttons[0].link));
+	if (evt.buttons[1]){
+		options.buttons.push(createButton(notID.toString() + 1, evt.buttons[1].buttonText, evt.buttons[1].link));
 	}
 
 	options.priority = 2;
@@ -86,6 +86,9 @@ function notificationClicked(notID) {
 }
 
 function notificationBtnClick(notID, iBtn) {
+  console.log(buttonLinkMap);
+  console.log(iBtn);
+  console.log(buttonLinkMap[notID+iBtn]);
   chrome.tabs.create({url: buttonLinkMap[notID+iBtn]});
 	console.log("The notification '" + notID + "' had button " + iBtn + " clicked");
 }
