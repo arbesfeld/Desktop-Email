@@ -76,13 +76,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(application: UIApplication!, didReceiveRemoteNotification userInfo:NSDictionary) {
         println(userInfo)
-        PFPush.handlePush({
-            "category":"FIRST_CATEGORY"
-            "alert":"test"
-        })
+        PFPush.handlePush(userInfo)
         
         if (userInfo.objectForKey("identifier") as NSString == "FIRST_ACTION"){
-          NSNotificationCenter.defaultCenter().postNotificationName("actionOnePressed", object: nil)
+          NSNotificationCenter.defaultCenter().postNotificationName("actionOnePressed", object: userInfo)
         } else if (userInfo.objectForKey("identifier") as NSString == "SECOND_ACTION"){
             NSNotificationCenter.defaultCenter().postNotificationName("actionTwoPressed", object: nil)
             
